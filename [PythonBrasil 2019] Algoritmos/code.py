@@ -1,3 +1,15 @@
+# [algoritmo.info for algoritmo in algoritmos.sort()]
+
+algoritmos = []
+[algoritmo.info for algoritmo in algoritmos.sort()]
+# Nem roda :(
+# TypeError: 'NoneType' object is not iterable
+
+
+"""
+Dicionário
+-------------------------------------------------------------------------------------
+"""
 from __future__ import division
 import sys
 
@@ -26,10 +38,15 @@ vars(places)
 print(list(map(sys.getsizeof, map(vars, [places]))))
 
 
+"""
+Configuração
+-------------------------------------------------------------------------------------
+"""
+
 keys = ['pybr19', 'pybr18', 'pybr17', 'pybr16', 'pybr15', 'pybr14', 'pybr13']
 values = [
-    'ribeirão preto', 'natal', 'belo horizonte', 
-    'florianopolis', 'sao jose dos campos', 'recife', 
+    'ribeirão preto', 'natal', 'belo horizonte',
+    'florianopolis', 'sao jose dos campos', 'recife',
     'brasilia'
 ]
 hashes = list(map(abs, map(hash, keys)))
@@ -43,8 +60,6 @@ entries = list(zip(hashes, keys, values))
  (5067670214198873854, 'pybr15', 'sao jose dos campos'),
  (2940889712379195968, 'pybr14', 'recife'),
  (8949678210916869228, 'pybr13', 'brasilia')]
-
-
 # [(664345387291340802, 'pybr19', 'ribeirão preto'),
 #  (1193475843086917206, 'pybr18', 'natal'),
 #  (2115422158974348649, 'pybr17', 'belo horizonte'),
@@ -52,6 +67,10 @@ entries = list(zip(hashes, keys, values))
 #  (2020306873403470778, 'pybr15', 'sao jose dos campos')]
 
 
+"""
+Helpers
+-------------------------------------------------------------------------------------
+"""
 def bits(n):
     n += 2**32
     return bin(n)[-32:]
@@ -61,6 +80,12 @@ def get_size(d):
     import sys
     return list(map(sys.getsizeof, map(vars, [d])))
 
+
+
+"""
+Funcionamento do dicionário
+-------------------------------------------------------------------------------------
+"""
 d = dict()
 d['pybr19'] = 'ribeirão preto'
 bits(hash('pybr19'))[-3:]
@@ -157,7 +182,6 @@ bits(hash('pybr15'))[-3:]
  -------------------------------------------------------
 """
 
-# open_addressing_multihash
 """
  -------------------------------------------------------
 |  Idx      hash            key             value       |
@@ -186,58 +210,6 @@ sys.getsizeof(d)
 
 d['pybr14'] = 'recife'
 sys.getsizeof(d)
-
-
-
-
-
-def print_table(result, entries):
-    print("-------------------------------------------------------")
-    print("|  Idx      hash            key             value       |")
-    print("-------------------------------------------------------")
-    for i, row in enumerate(result):
-        if row:
-            print(f"|  {bits(entries[i][0])[-5:]}  |  _{bits(entries[i][0])[-8:]}  |  {row[0]}  |  {row[1]}  |")
-        else:
-            print("empty")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-In [1]: d = {}
-In [2]: d['pybr18'] = 'natal'
-In [3]: bits(hash('pybr18'))[-3:]
-Out[4]: '001'
-
-"""
- -------------------------------------------------------
-|  Idx      hash            key             value       |
- -------------------------------------------------------
-|  000   |             |           |                    |
-|  010   |             |           |                    |
-|  001   | _11100001   |  pybr18   |  natal             |
-|  011   |             |           |                    |
-|  100   |             |           |                    |
-|  101   |             |           |                    |
-|  110   | _00101110   |  pybr19   |  ribeirão preto    |
-|  111   |             |           |                    |
- -------------------------------------------------------
-"""
 
 
 def compact_and_ordered(n, entries):
@@ -280,8 +252,7 @@ def open_addressing_multihash(n, entries):
         table[i] = (key, value)
     print(table)
 
-
-def open_addressing_multihash(n, entries):
+def open_addressing_multihash_print_improved(n, entries):
     table = [None] * n
     for h, key, value in entries:
         perturb = h
@@ -294,7 +265,7 @@ def open_addressing_multihash(n, entries):
     print(table)
 
 
-def open_addressing_multihash(n, entries):
+def open_addressing_multihash_print_improved_for_5_bits(n, entries):
     table = [None] * n
     for h, key, value in entries:
         perturb = h
@@ -305,97 +276,3 @@ def open_addressing_multihash(n, entries):
             perturb >>= 5
         table[i] = (bits(h)[-5:], key, value)
     print(table)
-
-
-
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |        value       |
- -------------------------------------------------------
-|  000   |             |           |                    |
-|  001   |             |           |                    |
-|  010   |             |           |                    |
-|  011   |             |           |                    |
-|  100   |             |           |                    |
-|  101   |             |           |                    |
-|  110   |             |           |                    |
-|  111   |             |           |                    |
- -------------------------------------------------------
-"""
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |        value       |
- -------------------------------------------------------
-|  000   |             |           |                    |
-|  001   |             |           |                    |
-|  010   |             |           |                    |
-|  011   |             |           |                    |
-|  100   |             |           |                    |
-|  101   |             |           |                    |
-|  110   |  _00101110  |   pybr19  |  ribeirão preto    |
-|  111   |             |           |                    |
- -------------------------------------------------------
-"""
-
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |        value       |
- -------------------------------------------------------
-|  000   |             |           |                    |
-|  001   |  _11100001  |   pybr18  |       natal        |
-|  010   |             |           |                    |
-|  011   |             |           |                    |
-|  100   |             |           |                    |
-|  101   |             |           |                    |
-|  110   |  _00101110  |   pybr19  |  ribeirão preto    |
-|  111   |             |           |                    |
- -------------------------------------------------------
-"""
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |      value         |
- -------------------------------------------------------
-|  000   |             |           |                    |
-|  001   | _11100001   |  pybr18   |  natal             |
-|  010   |             |           |                    |
-|  011   | _11110011   |  pybr17   |  belo horizonte    |
-|  100   |             |           |                    |
-|  101   |             |           |                    |
-|  110   | _00101110   |  pybr19   |  ribeirão preto    |
-|  111   |             |           |                    |
- -------------------------------------------------------
-"""
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |      value         |
- -------------------------------------------------------
-|  000   |    '--'     |   '--'    |       '--'         |
-|  001   | _11100001   |  pybr18   |  natal             |
-|  010   |    '--'     |   '--'    |       '--'         |
-|  011   | _11110011   |  pybr17   |  belo horizonte    |
-|  100   |    '--'     |   '--'    |       '--'         |
-|  101   | _01001110   |  pybr16   |  florianopolis     |
-|  110   | _00101110   |  pybr19   |  ribeirão preto    |
-|  111   |    '--'     |   '--'    |       '--'         |
- -------------------------------------------------------
-"""
-
-"""
- -------------------------------------------------------
-|  idx   |    hash     |   key     |      value         |
- -------------------------------------------------------
-|  000   |    '--'     |   '--'    |       '--'         |
-|  001   | _11100001   |  pybr18   |  natal             |
-|  010   |    '--'     |   '--'    |       '--'         |
-|  011   | _11110011   |  pybr17   |  belo horizonte    |
-|  100   |    '--'     |   '--'    |       '--'         |
-|  101   |    '--'     |   '--'    |       '--'         |
-|  110   | _00101110   |  pybr19   |  ribeirão preto    |
-|  111   |    '--'     |   '--'    |       '--'         |
- -------------------------------------------------------
- """
